@@ -20,3 +20,5 @@ mängib(jüri, korvpall).
 omab(X, kana) :- maja(X, sinine).
 omab(X, kanaarilind) :- maja(X, roheline).
 trenn(X, jalka) :- omab(X, koer).
+
+lendab(lind).
