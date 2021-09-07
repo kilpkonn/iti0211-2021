@@ -1,1 +1,0 @@
-lendab(kajakas).
