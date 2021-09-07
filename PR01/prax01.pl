@@ -25,8 +25,8 @@ mother(ruudo, malle).
 mother(tarmo, malle).
 
 father(Child, Father) :- mother(Child, Mother), married(Mother, Father).
-brother(Child, Brother) :- mother(Child, Mother), mother(Brother, Mother), male(Brother).
-sister(Child, Sister) :- mother(Child, Mother), mother(Sister, Mother), female(Sister).
+brother(Child, Brother) :- mother(Child, Mother), mother(Brother, Mother). % , male(Brother).
+sister(Child, Sister) :- mother(Child, Mother), mother(Sister, Mother). % , female(Sister).
 aunt(Child, Aunt) :- mother(Child, Mother), sister(Mother, Aunt).
 aunt(Child, Aunt) :- father(Child, Father), sister(Father, Aunt).
 uncle(Child, Uncle) :- father(Child, Father), brother(Father, Uncle).
