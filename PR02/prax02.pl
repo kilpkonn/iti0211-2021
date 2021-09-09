@@ -1,45 +1,67 @@
 
-male(tavo).
-male(evo).
-male(tarmo).
-male(ahto).
-male(mati).
-male(teet).
-male(kurmo).
-male(ruudo).
-male(matiIsa).
-male(tiiuIsa).
-male(ahtoIsa).
-male(malleIsa).
-female(liis).
-female(terje).
-female(malle).
-female(tiiu).
-female(tiiuEma).
-female(matiEma).
-female(malleEma).
-female(ahtoEma).
+% male(tavo).
+% male(evo).
+% male(tarmo).
+% male(ahto).
+% male(mati).
+% male(teet).
+% male(kurmo).
+% male(ruudo).
+% male(matiIsa).
+% male(tiiuIsa).
+% male(ahtoIsa).
+% male(malleIsa).
+% female(liis).
+% female(terje).
+% female(malle).
+% female(tiiu).
+% female(tiiuEma).
+% female(matiEma).
+% female(malleEma).
+% female(ahtoEma).
+% 
+% married(terje, tarmo).
+% married(malle, ahto).
+% married(tiiu, mati).
+% married(tiiuEma, tiiuIsa).
+% married(ahtoEma, ahtoIsa).
+% married(matiEma, matiIsa).
+% married(malleEma, malleIsa).
+% 
+% mother(tavo, terje).
+% mother(evo, terje).
+% mother(liis, terje).
+% mother(terje, tiiu).
+% mother(teet, tiiu).
+% mother(kurmo, malle).
+% mother(ruudo, malle).
+% mother(tarmo, malle).
+% mother(tiiu, tiiuEma).
+% mother(malle, malleEma).
+% mother(mati, matiEma).
+% mother(ahto, ahtoEma).
 
-married(terje, tarmo).
-married(malle, ahto).
-married(tiiu, mati).
-married(tiiuEma, tiiuIsa).
-married(ahtoEma, ahtoIsa).
-married(matiEma, matiIsa).
-married(malleEma, malleIsa).
+male(a).
+male(a2).
+male(a3).
+male(a4).
+male(a5).
+female(b).
+female(b2).
+female(b3).
+female(b4).
+female(b5).
 
-mother(tavo, terje).
-mother(evo, terje).
-mother(liis, terje).
-mother(terje, tiiu).
-mother(teet, tiiu).
-mother(kurmo, malle).
-mother(ruudo, malle).
-mother(tarmo, malle).
-mother(tiiu, tiiuEma).
-mother(malle, malleEma).
-mother(mati, matiEma).
-mother(ahto, ahtoEma).
+mother(b, b2).
+mother(b2, b3).
+mother(b3, b4).
+mother(b4, b5).
+
+married(b, a).
+married(b2, a2).
+married(b3, a3).
+married(b4, a4).
+married(b5, a5).
 
 father(Child, Father) :- mother(Child, Mother), married(Mother, Father).
 
