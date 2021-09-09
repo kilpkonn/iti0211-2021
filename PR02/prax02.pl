@@ -57,9 +57,6 @@ anchestor1(Child, Parent, N) :- mother(Child, Parent), N = 1.
 anchestor1(Child, Parent, N) :- father(Child, X), anchestor1(X, Parent, M), N is M + 1.
 anchestor1(Child, Parent, N) :- mother(Child, X), anchestor1(X, Parent, M), N is M + 1.
 
-has_children(Parent, X) :- father(Parent, _), X = 1.
-has_children(Parent, X) :- mother(Parent, _), X = 1.
-has_children(Parent, X) :- father(Parent, _), has_children(Parent, Y), X is Y + 1. 
-has_children(Parent, X) :- mother(Parent, _), has_children(Parent, Y), X is Y + 1. 
+has_children(Parent, X) :- findall(Child, (father(Child, Parent) ; mother(Child, Parent)), List), length(List, X).
 
 anchestor2(Child, Parent, X) :- anchestor(Child, Parent), has_children(Parent, Y), X < Y.
