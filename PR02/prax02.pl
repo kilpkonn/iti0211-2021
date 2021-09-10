@@ -79,18 +79,18 @@ grandfather(Child, Grandfather) :- mother(Child, Father), father(Father, Grandfa
 grandmother(Child, Grandmother) :- father(Child, Mother), mother(Mother, Grandmother).
 grandmother(Child, Grandmother) :- mother(Child, Mother), mother(Mother, Grandmother).
 
-% anchestor(Child, Parent) :- father(Child, Parent) ; mother(Child, Parent).
-% anchestor(Child, Parent) :- father(Child, X), anchestor(X, Parent).
-% anchestor(Child, Parent) :- mother(Child, X), anchestor(X, Parent).
-ancestor(Child, Parent) :- mother(Child, Parent) ; father(Child, Parent).
-ancestor(Child, Parent) :- (mother(Child, X) ; father(Child, X)), ancestor(X, Parent).
+ancestor(Child, Parent) :- father(Child, Parent) ; mother(Child, Parent).
+ancestor(Child, Parent) :- father(Child, X), anchestor(X, Parent).
+ancestor(Child, Parent) :- mother(Child, X), anchestor(X, Parent).
+% ancestor(Child, Parent) :- mother(Child, Parent) ; father(Child, Parent).
+% ancestor(Child, Parent) :- (mother(Child, X) ; father(Child, X)), ancestor(X, Parent).
 male_ancestor(Child, Parent) :- male(Parent), anchestor(Child, Parent).
 female_ancestor(Child, Parent) :- female(Parent), anchestor(Child, Parent).
 
-anchestor1(Child, Parent, N) :- (mother(Child, Parent); father(Child, Parent)), N = 1.
-anchestor1(Child, Parent, N) :- father(Child, X), anchestor1(X, Parent, M), N is M + 1.
-anchestor1(Child, Parent, N) :- mother(Child, X), anchestor1(X, Parent, M), N is M + 1.
+ancestor1(Child, Parent, N) :- (mother(Child, Parent); father(Child, Parent)), N = 1.
+ancestor1(Child, Parent, N) :- father(Child, X), anchestor1(X, Parent, M), N is M + 1.
+ancestor1(Child, Parent, N) :- mother(Child, X), anchestor1(X, Parent, M), N is M + 1.
 
 has_children(Parent, X) :- findall(Child, (father(Child, Parent) ; mother(Child, Parent)), List), length(List, X).
 
-anchestor2(Child, Parent, X) :- anchestor(Child, Parent), has_children(Parent, Y), X < Y.
+ancestor2(Child, Parent, X) :- anchestor(Child, Parent), has_children(Parent, Y), X < Y.
