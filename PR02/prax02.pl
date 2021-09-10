@@ -79,10 +79,11 @@ grandfather(Child, Grandfather) :- mother(Child, Father), father(Father, Grandfa
 grandmother(Child, Grandmother) :- father(Child, Mother), mother(Mother, Grandmother).
 grandmother(Child, Grandmother) :- mother(Child, Mother), mother(Mother, Grandmother).
 
-anchestor(Child, Parent) :- father(Child, Parent) ; mother(Child, Parent).
-anchestor(Child, Parent) :- father(Child, X), anchestor(X, Parent).
-anchestor(Child, Parent) :- mother(Child, X), anchestor(X, Parent).
-
+% anchestor(Child, Parent) :- father(Child, Parent) ; mother(Child, Parent).
+% anchestor(Child, Parent) :- father(Child, X), anchestor(X, Parent).
+% anchestor(Child, Parent) :- mother(Child, X), anchestor(X, Parent).
+ancestor(Child, Parent) :- mother(Child, Parent) ; father(Child, Parent).
+ancestor(Child, Parent) :- (mother(Child, X) ; father(Child, X)), ancestor(X, Parent).
 male_ancestor(Child, Parent) :- male(Parent), anchestor(Child, Parent).
 female_ancestor(Child, Parent) :- female(Parent), anchestor(Child, Parent).
 
