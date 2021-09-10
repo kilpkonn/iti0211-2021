@@ -40,28 +40,6 @@ mother(malle, malleEma).
 mother(mati, matiEma).
 mother(ahto, ahtoEma).
 
-% male(a).
-% male(a2).
-% male(a3).
-% male(a4).
-% male(a5).
-% female(b).
-% female(b2).
-% female(b3).
-% female(b4).
-% female(b5).
-% 
-% mother(b, b2).
-% mother(b2, b3).
-% mother(b3, b4).
-% mother(b4, b5).
-% 
-% married(b, a).
-% married(b2, a2).
-% married(b3, a3).
-% married(b4, a4).
-% married(b5, a5).
-
 father(Child, Father) :- mother(Child, Mother), married(Mother, Father).
 
 brother(Child, Brother) :- mother(Child, Mother), mother(Brother, Mother), male(Brother), Brother \= Child.
@@ -82,8 +60,6 @@ grandmother(Child, Grandmother) :- mother(Child, Mother), mother(Mother, Grandmo
 ancestor(Child, Parent) :- father(Child, Parent) ; mother(Child, Parent).
 ancestor(Child, Parent) :- father(Child, X), ancestor(X, Parent).
 ancestor(Child, Parent) :- mother(Child, X), ancestor(X, Parent).
-% ancestor(Child, Parent) :- mother(Child, Parent) ; father(Child, Parent).
-% ancestor(Child, Parent) :- (mother(Child, X) ; father(Child, X)), ancestor(X, Parent).
 male_ancestor(Child, Parent) :- male(Parent), ancestor(Child, Parent).
 female_ancestor(Child, Parent) :- female(Parent), ancestor(Child, Parent).
 
