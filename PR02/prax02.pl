@@ -86,8 +86,7 @@ anchestor(Child, Parent) :- mother(Child, X), anchestor(X, Parent).
 male_ancestor(Child, Parent) :- male(Parent), anchestor(Child, Parent).
 female_ancestor(Child, Parent) :- female(Parent), anchestor(Child, Parent).
 
-anchestor1(Child, Parent, N) :- father(Child, Parent), N = 1.
-anchestor1(Child, Parent, N) :- mother(Child, Parent), N = 1.
+anchestor1(Child, Parent, N) :- (mother(Child, Parent); father(Child, Parent)), N = 1.
 anchestor1(Child, Parent, N) :- father(Child, X), anchestor1(X, Parent, M), N is M + 1.
 anchestor1(Child, Parent, N) :- mother(Child, X), anchestor1(X, Parent, M), N is M + 1.
 
