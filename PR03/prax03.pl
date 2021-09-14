@@ -4,12 +4,37 @@ viimane_element(X, [_ | Xs]) :- viimane_element(X, Xs).
 
 
 suurim([], []).
-suurim([X], [X | _]).
-suurim([X, Z | Xs], Ys) :- 
+suurim([X], [X]).
+suurim([X, Z | Xs], [X | Ys]) :- 
   X >= Z,
-  Ys = [X | Zs],
-  suurim([Z | Xs], Zs).
-suurim([X, Z | Xs], Ys) :- 
+  suurim([Z | Xs], Ys).
+suurim([X, Z | Xs], [Z | Ys]) :- 
   X < Z,
-  Ys = [Z | Zs],
-  suurim([Z | Xs], Zs).
+  suurim([Z | Xs], Ys).
+
+
+paki([], []).
+paki([X], [X]).
+paki([X, Y | Xs], Ys) :-
+  X == Y,
+  paki([Y | Xs], Ys).
+paki([X, Y | Xs], [X | Ys]) :-
+  X \= Y,
+  paki([Y | Xs], Ys).
+
+
+duplikeeri([], []).
+duplikeeri([X | Xs], [X, X | Ys]) :-
+  duplikeeri(Xs, Ys).
+
+  
+kordista_acc(X, 1, [X | _]).
+kordista_acc(X, N, [X | Zs]) :-
+  M is N - 1,
+  kordista_acc(X, M, Zs).
+
+kordista([], _, []).
+kordista([X | Xs], N, Ys) :-
+  Ys = kordista_acc(X, N, Zs),
+  kordista(Xs, N, Zs).
+
