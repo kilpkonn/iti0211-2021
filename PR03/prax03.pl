@@ -39,8 +39,8 @@ kordista([X | Xs], N, Ys) :-
   kordista(Xs, N, Zs).
 
 
-paaritu_arv(X) :- 1 is X rem 2.
-paaris_arv(X) :- 0 is X rem 2.
+paaritu_arv(X) :- 1 =:= X rem 2.
+paaris_arv(X) :- 0 =:= X rem 2.
 suurem_kui(N, M) :- N > M.
 
 vordle_predikaadiga([], _, []).
