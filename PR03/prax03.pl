@@ -38,3 +38,17 @@ kordista([X | Xs], N, Ys) :-
   kordista_acc(X, N, Zs, Ys),
   kordista(Xs, N, Zs).
 
+
+paaritu_arv(X) :- 1 is X rem 2.
+paaris_arv(X) :- 0 is X rem 2.
+suurem_kui(N, M) :- N > M.
+
+vordle_predikaadiga([], _, []).
+vordle_predikaadiga([X | Xs], [Predikaat | Args], [X | Ys]) :-
+  Term =.. [Predikaat, X | Args],
+  Term,
+  vordle_predikaadiga(Xs, [Predikaat | Args], Ys).
+vordle_predikaadiga([X | Xs], [Predikaat | Args], Ys) :-
+  Term =.. [Predikaat, X | Args],
+  not(Term),
+  vordle_predikaadiga(Xs, [Predikaat | Args], Ys).
