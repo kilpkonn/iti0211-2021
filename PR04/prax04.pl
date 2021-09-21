@@ -10,10 +10,7 @@ lennukiga(paris, tallinn, 120).
 
 
 reisi(X, Y) :- laevaga(X, Y, _); bussiga(X, Y, _); rongiga(X, Y, _); lennukiga(X, Y, _), !.
-reisi(X, Y) :- laevaga(X, Z, _), reisi(Z, Y).
-reisi(X, Y) :- bussiga(X, Z, _), reisi(Z, Y).
-reisi(X, Y) :- rongiga(X, Z, _), reisi(Z, Y).
-reisi(X, Y) :- lennukiga(X, Z, _), reisi(Z, Y).
+reisi(X, Y) :- (laevaga(X, Y, _); bussiga(X, Y, _); rongiga(X, Y, _); lennukiga(X, Y, _)), reisi(Z, Y), !.
 
 reisi(X, Y, Path) :- (laevaga(X, Y, _); bussiga(X, Y, _); rongiga(X, Y, _); lennukiga(X, Y, _)), Path = mine(X, Y), !.
 reisi(X, Y, Path) :- 
