@@ -45,18 +45,18 @@ reisi(X, Y, Path, Cost) :- rongiga(X, Y, Cost), Path = mine(X, Y, rongiga), !.
 reisi(X, Y, Path, Cost) :- lennukiga(X, Y, Cost), Path = mine(X, Y, lennukiga), !.
 reisi(X, Y, Path, Cost) :- laevaga(X, Z, CostA),
   Path = mine(X, Z, laevaga, SubPath),
-  Cost is CostA + CostB,
-  reisi(Z, Y, SubPath, CostB).
+  reisi(Z, Y, SubPath, CostB),
+  Cost is CostA + CostB.
 reisi(X, Y, Path, Cost) :- bussiga(X, Z, CostA),
   Path = mine(X, Z, bussiga, SubPath),
-  Cost is CostA + CostB,
-  reisi(Z, Y, SubPath, CostB).
+  reisi(Z, Y, SubPath, CostB),
+  Cost is CostA + CostB.
 reisi(X, Y, Path, Cost) :- rongiga(X, Z, CostA),
   Path = mine(X, Z, rongiga, SubPath),
-  Cost is CostA + CostB,
-  reisi(Z, Y, SubPath, CostB).
+  reisi(Z, Y, SubPath, CostB),
+  Cost is CostA + CostB.
 reisi(X, Y, Path, Cost) :- lennukiga(X, Z, CostA),
   Path = mine(X, Z, lennukiga, SubPath),
-  Cost is CostA + CostB,
-  reisi(Z, Y, SubPath, CostB).
+  reisi(Z, Y, SubPath, CostB),
+  Cost is CostA + CostB.
 
