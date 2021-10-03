@@ -70,3 +70,14 @@ reisi(X, Y, Path, Cost) :- lennukiga(X, Z, CostA),
   reisi(Z, Y, SubPath, CostB),
   Cost is CostA + CostB.
 
+min_list([Head], Head).
+min_list([Head, Next | Tail], N) :- 
+  (Head =< Next, min_list([Head | Tail], N));
+  (Head > Next, min_list([Next | Tail], N)).
+
+odavaim_reis(X, Y, Path, Cost) :- 
+  findall(TmpCost, reisi(X, Y, _, TmpCost), Results),
+  min_list(Results, Cost),
+  reisi(X, Y, Path, Cost).
+
+
