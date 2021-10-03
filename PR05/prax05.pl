@@ -76,8 +76,41 @@ min_list([Head, Next | Tail], N) :-
   (Head > Next, min_list([Next | Tail], N)).
 
 odavaim_reis(X, Y, Path, Cost) :- 
-  findall(TmpCost, reisi(X, Y, _, TmpCost), Results),
+  bagof(TmpCost, reisi(X, Y, _, TmpCost), Results),
   min_list(Results, Cost),
   reisi(X, Y, Path, Cost).
 
 
+time_diff_s(time(H1, M1, S1), time(H2, M2, S2), DiffS) :- 
+  Diff is (H2 - H1) * 3600 + (M2 - M1) * 60 + (S2 - S1),
+  (
+    Diff > 0, DiffS = Diff;
+    DiffS is Diff + 24 * 60 * 60
+  ).
+
+
+reisi(X, Y, Path, Cost, TimeS) :- 
+  ( 
+    laevaga(X, Y, Cost, TimeStart, TimeEnd), Path = mine(X, Y, laevaga);
+    bussiga(X, Y, Cost, TimeStart, TimeEnd), Path = mine(X, Y, bussiga);
+    rongiga(X, Y, Cost, TimeStart, TimeEnd), Path = mine(X, Y, rongiga);
+    lennukiga(X, Y, Cost, TimeStart, TimeEnd), Path = mine(X, Y, lennukiga)
+  ),
+  time_diff_s(TimeStart, TimeEnd, TimeS).
+
+reisi(X, Y, Path, Cost, TimeS) :-
+  (
+    laevaga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, laevaga, SubPath);
+    bussiga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, bussiga, SubPath);
+    rongiga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, rongiga, SubPath);
+    lennukiga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, lennukiga, SubPath)
+  ),
+  reisi(Z, Y, SubPath, CostB, TimeRest),
+  Cost is CostA + CostB,
+  time_diff_s(TimeStart, TimeEnd, TimeCurr),
+  TimeS is TimeCurr + TimeRest.
+
+lyhim_reis(X, Y, Path, Cost) :-
+  bagof(TmpTime, reisi(X, Y, _, _, TmpTime), Results),
+  min_list(Results, MinTime),
+  reisi(X, Y, Path, Cost, MinTime).
