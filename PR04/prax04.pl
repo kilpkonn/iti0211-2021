@@ -6,7 +6,6 @@ lennukiga(tallinn, helsinki, 30).
 lennukiga(helsinki, paris, 180).
 lennukiga(paris, berlin, 120). 
 lennukiga(paris, tallinn, 120).
-% bussiga)berlin, tallinn, 1200).
 
 
 reisi(X, Y) :- laevaga(X, Y, _); bussiga(X, Y, _); rongiga(X, Y, _); lennukiga(X, Y, _), !.
