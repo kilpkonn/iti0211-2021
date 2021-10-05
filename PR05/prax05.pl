@@ -90,6 +90,7 @@ time_diff_s(time(H1, M1, S1), time(H2, M2, S2), DiffS) :-
 
 
 reisi(X, Y, Path, Cost, TimeS) :- 
+  not(labitud(X)), abolish(labitud/1),
   ( 
     laevaga(X, Y, Cost, TimeStart, TimeEnd), Path = mine(X, Y, laevaga);
     bussiga(X, Y, Cost, TimeStart, TimeEnd), Path = mine(X, Y, bussiga);
@@ -99,6 +100,7 @@ reisi(X, Y, Path, Cost, TimeS) :-
   time_diff_s(TimeStart, TimeEnd, TimeS).
 
 reisi(X, Y, Path, Cost, TimeS) :-
+  not(labitud(X)), asserta(labitud(X)),
   (
     laevaga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, laevaga, SubPath);
     bussiga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, bussiga, SubPath);
