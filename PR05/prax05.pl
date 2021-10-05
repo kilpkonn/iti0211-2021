@@ -109,6 +109,7 @@ time_diff_s(time(H1, M1, S1), time(H2, M2, S2), DiffS) :-
     DiffS is Diff + 24 * 60 * 60
   ).
 
+:- dynamic eelimse_lopp/1.
 
 reisi(X, Y, Path, Cost, TimeS) :- 
   not(labitud(X)), 
@@ -118,16 +119,23 @@ reisi(X, Y, Path, Cost, TimeS) :-
     rongiga(X, Y, Cost, TimeStart, TimeEnd), Path = mine(X, Y, rongiga);
     lennukiga(X, Y, Cost, TimeStart, TimeEnd), Path = mine(X, Y, lennukiga)
   ),
+  eelmise_lopp(TimeLast),
+  time_diff_s(TimeLast, TimeStart, WaitTime),
+  WaitTime > 60 * 60,
   time_diff_s(TimeStart, TimeEnd, TimeS).
 
 reisi(X, Y, Path, Cost, TimeS) :-
-  not(labitud(X)), asserta(labitud(X)),
+  not(labitud(X)),
   (
     laevaga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, laevaga, SubPath);
     bussiga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, bussiga, SubPath);
     rongiga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, rongiga, SubPath);
     lennukiga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, lennukiga, SubPath)
   ),
+  eelmise_lopp(TimeLast),
+  time_diff_s(TimeLast, TimeStart, WaitTime),
+  WaitTime > 60 * 60,
+  asserta(labitud(X)),
   (reisi(Z, Y, SubPath, CostB, TimeRest) ; retract(labitud(X)), fail),
   retract(labitud(X)),
   Cost is CostA + CostB,
