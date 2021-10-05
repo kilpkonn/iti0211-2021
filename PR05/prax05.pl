@@ -109,7 +109,8 @@ time_diff_s(time(H1, M1, S1), time(H2, M2, S2), DiffS) :-
     DiffS is Diff + 24 * 60 * 60
   ).
 
-:- dynamic eelimse_lopp/1.
+:- dynamic eelmise_lopp/1.
+eelmise_lopp(time(0, 0, 0)).
 
 reisi(X, Y, Path, Cost, TimeS) :- 
   not(labitud(X)), 
@@ -136,11 +137,13 @@ reisi(X, Y, Path, Cost, TimeS) :-
   time_diff_s(TimeLast, TimeStart, WaitTime),
   WaitTime > 60 * 60,
   asserta(labitud(X)),
-  (reisi(Z, Y, SubPath, CostB, TimeRest) ; retract(labitud(X)), fail),
+  abolish(eelmise_lopp/1), asserta(eelmise_lopp(TimeEnd)),
+  (reisi(Z, Y, SubPath, CostB, TimeRest) ; retract(labitud(X)), abolish(eelmise_lopp/1), asserta(eelmise_lopp(TimeLast)), fail),
   retract(labitud(X)),
   Cost is CostA + CostB,
   time_diff_s(TimeStart, TimeEnd, TimeCurr),
-  TimeS is TimeCurr + TimeRest.
+  TimeS is TimeCurr + TimeRest,
+  abolish(eelmise_lopp/1), asserta(eelmise_lopp(TimeLast)).
 
 lyhim_reis(X, Y, Path, Cost) :-
   bagof(TmpTime, reisi(X, Y, _, _, TmpTime), Results),
