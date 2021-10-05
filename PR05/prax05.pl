@@ -31,20 +31,24 @@ reisi(X, Y, Path) :-
   Path = mine(X, Z, SubPath),
   reisi(Z, Y, SubPath), !.
 
-reisi_transpordiga(X, Y, Path) :- laevaga(X, Y, _), Path = mine(X, Y, laevaga), !.
-reisi_transpordiga(X, Y, Path) :- bussiga(X, Y, _), Path = mine(X, Y, bussiga), !.
-reisi_transpordiga(X, Y, Path) :- rongiga(X, Y, _), Path = mine(X, Y, rongiga), !.
-reisi_transpordiga(X, Y, Path) :- lennukiga(X, Y, _), Path = mine(X, Y, lennukiga), !.
-reisi_transpordiga(X, Y, Path) :- laevaga(X, Z, _),
+reisi_transpordiga(X, Y, Path) :- not(labitud(X)), abolish(labitud/1), laevaga(X, Y, _), Path = mine(X, Y, laevaga), !.
+reisi_transpordiga(X, Y, Path) :- not(labitud(X)), abolish(labitud/1), bussiga(X, Y, _), Path = mine(X, Y, bussiga), !.
+reisi_transpordiga(X, Y, Path) :- not(labitud(X)), abolish(labitud/1), rongiga(X, Y, _), Path = mine(X, Y, rongiga), !.
+reisi_transpordiga(X, Y, Path) :- not(labitud(X)), abolish(labitud/1), lennukiga(X, Y, _), Path = mine(X, Y, lennukiga), !.
+reisi_transpordiga(X, Y, Path) :- laevaga(X, Z, _), 
+  not(labitud(X)), asserta(labitud(X)), 
   Path = mine(X, Z, laevaga, SubPath),
   reisi_transpordiga(Z, Y, SubPath).
-reisi_transpordiga(X, Y, Path) :- bussiga(X, Z, _),
+reisi_transpordiga(X, Y, Path) :- bussiga(X, Z, _), 
+  not(labitud(X)), asserta(labitud(X)), 
   Path = mine(X, Z, bussiga, SubPath),
   reisi_transpordiga(Z, Y, SubPath).
-reisi_transpordiga(X, Y, Path) :- rongiga(X, Z, _),
+reisi_transpordiga(X, Y, Path) :- rongiga(X, Z, _), 
+  not(labitud(X)), asserta(labitud(X)), 
   Path = mine(X, Z, rongiga, SubPath),
   reisi_transpordiga(Z, Y, SubPath).
 reisi_transpordiga(X, Y, Path) :- lennukiga(X, Z, _),
+  not(labitud(X)), asserta(labitud(X)), 
   Path = mine(X, Z, lennukiga, SubPath),
   reisi_transpordiga(Z, Y, SubPath).
 
