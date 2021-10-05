@@ -10,6 +10,7 @@ lennukiga(paris, tallinn, 120).
 :- dynamic labitud/1.
 
 reisi(X, Y) :- not(labitud(X)), laevaga(X, Y, _); bussiga(X, Y, _); rongiga(X, Y, _); lennukiga(X, Y, _), !.
+
 reisi(X, Y) :- not(labitud(X)), asserta(labitud(X)), 
   (laevaga(X, Z, _) ; retract(labitud(X)), fail),
   reisi(Z, Y), retract(labitud(X)).
@@ -20,7 +21,7 @@ reisi(X, Y) :- not(labitud(X)), asserta(labitud(X)),
   (rongiga(X, Z, _) ; retract(labitud(X)), fail),
     reisi(Z, Y), retract(labitud(X)).
 reisi(X, Y) :- not(labitud(X)), asserta(labitud(X)),
-  (lennukiga(X, Z, _) ; retract(labitud(X))),
+  (lennukiga(X, Z, _) ; retract(labitud(X)), fail),
   reisi(Z, Y), retract(labitud(X)).
 
 reisi(X, Y, Path) :- not(labitud(X)), (laevaga(X, Y, _); bussiga(X, Y, _); rongiga(X, Y, _); lennukiga(X, Y, _)), Path = mine(X, Y), !.
