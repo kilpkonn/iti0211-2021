@@ -18,7 +18,7 @@ reisi(X, Y) :- lennukiga(X, Z, _), reisi(Z, Y).
 reisi(X, Y, Path) :- not(labitud(X)), (laevaga(X, Y, _); bussiga(X, Y, _); rongiga(X, Y, _); lennukiga(X, Y, _)), Path = mine(X, Y), !.
 reisi(X, Y, Path) :- 
   not(labitud(X)), asserta(labitud(X)),
-  ((laevaga(X, Z, _); bussiga(X, Z, _); rongiga(X, Z, _); lennukiga(X, Z, _)), retract(labitud(X)), fail),
+  ((laevaga(X, Z, _); bussiga(X, Z, _); rongiga(X, Z, _); lennukiga(X, Z, _)) ; retract(labitud(X)), fail),
   Path = mine(X, Z, SubPath),
   reisi(Z, Y, SubPath),
   retract(labitud(X)), !.
