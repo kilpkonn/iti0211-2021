@@ -111,7 +111,7 @@ time_diff_s(time(H1, M1, S1), time(H2, M2, S2), DiffS) :-
 
 
 reisi(X, Y, Path, Cost, TimeS) :- 
-  not(labitud(X)), abolish(labitud/1),
+  not(labitud(X)), 
   ( 
     laevaga(X, Y, Cost, TimeStart, TimeEnd), Path = mine(X, Y, laevaga);
     bussiga(X, Y, Cost, TimeStart, TimeEnd), Path = mine(X, Y, bussiga);
@@ -128,8 +128,8 @@ reisi(X, Y, Path, Cost, TimeS) :-
     rongiga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, rongiga, SubPath);
     lennukiga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, lennukiga, SubPath)
   ),
-  reisi(Z, Y, SubPath, CostB, TimeRest),
-  retractall(labitud(X)),
+  (reisi(Z, Y, SubPath, CostB, TimeRest) ; retract(labitud(X)), fail),
+  retract(labitud(X)),
   Cost is CostA + CostB,
   time_diff_s(TimeStart, TimeEnd, TimeCurr),
   TimeS is TimeCurr + TimeRest.
