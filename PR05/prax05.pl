@@ -108,7 +108,7 @@ reisi(X, Y, Path, Cost, TimeS) :-
     lennukiga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, lennukiga, SubPath)
   ),
   reisi(Z, Y, SubPath, CostB, TimeRest),
-  erase(labitud(X)),
+  retract(labitud(X)),
   Cost is CostA + CostB,
   time_diff_s(TimeStart, TimeEnd, TimeCurr),
   TimeS is TimeCurr + TimeRest.
