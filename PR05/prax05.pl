@@ -48,7 +48,7 @@ reisi(X, Y, Path) :-
   Path = mine(X, Z, SubPath),
   not(labitud(Path)), asserta(labitud(Path)),
   reisi(Z, Y, SubPath),
-  retract(labitud(Path)), !.
+  retract(labitud(Path)).
 
 reisi_transpordiga(X, Y, mine(X, Y, laevaga)) :- not(labitud(mine(X, Y, laevaga))), laevaga(X, Y, _), asserta(lopp(Y)).
 reisi_transpordiga(X, Y, mine(X, Y, bussiga)) :- not(labitud(mine(X, Y, bussiga))), bussiga(X, Y, _), asserta(lopp(Y)).
@@ -75,31 +75,25 @@ reisi_transpordiga(X, Y, mine(X, Z, lennukiga, SubPath)) :- lennukiga(X, Z, _),
   retract(labitud(Path)).
 
 
-reisi(X, Y, Path, Cost) :- not(labitud(Path)), laevaga(X, Y, Cost), Path = mine(X, Y, laevaga), !.
-reisi(X, Y, Path, Cost) :- not(labitud(Path)), bussiga(X, Y, Cost), Path = mine(X, Y, bussiga), !.
-reisi(X, Y, Path, Cost) :- not(labitud(Path)), rongiga(X, Y, Cost), Path = mine(X, Y, rongiga), !.
-reisi(X, Y, Path, Cost) :- not(labitud(Path)), lennukiga(X, Y, Cost), Path = mine(X, Y, lennukiga), !.
+reisi(X, Y, Path, Cost) :- laevaga(X, Y, Cost), Path = mine(X, Y, laevaga), not(labitud(Path)), asserta(lopp(Y)).
+reisi(X, Y, Path, Cost) :- bussiga(X, Y, Cost), Path = mine(X, Y, bussiga), not(labitud(Path)), asserta(lopp(Y)).
+reisi(X, Y, Path, Cost) :- rongiga(X, Y, Cost), Path = mine(X, Y, rongiga), not(labitud(Path)), asserta(lopp(Y)).
+reisi(X, Y, Path, Cost) :- lennukiga(X, Y, Cost), Path = mine(X, Y, lennukiga), not(labitud(Path)), asserta(lopp(Y)).
 
-reisi(X, Y, mine(X, Z, laevaga, SubPath), Cost) :- laevaga(X, Z, CostA),
+reisi(_, Y, _, _) :- lopp(Y), retractall(lopp(Y)), !, fail.
+
+reisi(X, Y, Path, Cost) :- 
+  (
+    laevaga(X, Z, CostA), Path = mine(X, Z, laevaga, SubPath);
+    bussiga(X, Z, CostA), Path = mine(X, Z, bussiga, SubPath);
+    rongiga(X, Z, CostA), Path = mine(X, Z, rongiga, SubPath);
+    lennukiga(X, Z, CostA), Path = mine(X, Z, lennukiga, SubPath)
+  ),
   not(labitud(Path)), asserta(labitud(Path)),
   (reisi(Z, Y, SubPath, CostB) ; retract(labitud(Path)), fail),
   Cost is CostA + CostB,
   retract(labitud(Path)).
-reisi(X, Y, mine(X, Z, bussiga, SubPath), Cost) :- bussiga(X, Z, CostA),
-  not(labitud(Path)), asserta(labitud(Path)),
-  (reisi(Z, Y, SubPath, CostB) ; retract(labitud(Path)), fail),
-  Cost is CostA + CostB,
-  retract(labitud(Path)).
-reisi(X, Y, mine(X, Z, rongiga, SubPath), Cost) :- rongiga(X, Z, CostA),
-  not(labitud(Path)), asserta(labitud(Path)),
-  (reisi(Z, Y, SubPath, CostB) ; retract(labitud(Path)), fail),
-  Cost is CostA + CostB,
-  retract(labitud(Path)).
-reisi(X, Y, mine(X, Z, lennukiga, SubPath), Cost) :- lennukiga(X, Z, CostA),
-  not(labitud(Path)), asserta(labitud(Path)),
-  (reisi(Z, Y, SubPath, CostB) ; retract(labitud(Path)), fail),
-  Cost is CostA + CostB,
-  retract(labitud(Path)).
+
 
 min_list([Head], Head).
 min_list([Head, Next | Tail], N) :- 
@@ -107,7 +101,7 @@ min_list([Head, Next | Tail], N) :-
   (Head > Next, min_list([Next | Tail], N)).
 
 odavaim_reis(X, Y, Path, Cost) :- 
-  bagof(TmpCost, reisi(X, Y, _, TmpCost), Results),
+  findall(TmpCost, reisi(X, Y, _, TmpCost), Results),
   min_list(Results, Cost),
   reisi(X, Y, Path, Cost).
 
