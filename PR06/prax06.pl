@@ -78,7 +78,7 @@ reisi_transpordiga(X, Y, mine(X, Z, lennukiga, SubPath)) :- lennukiga(X, Z, _),
 reisi(X, Y, Path, Cost) :- laevaga(X, Y, Cost), Path = mine(X, Y, laevaga), not(labitud(Path)), asserta(lopp(Y)).
 reisi(X, Y, Path, Cost) :- bussiga(X, Y, Cost), Path = mine(X, Y, bussiga), not(labitud(Path)), asserta(lopp(Y)).
 reisi(X, Y, Path, Cost) :- rongiga(X, Y, Cost), Path = mine(X, Y, rongiga), not(labitud(Path)), asserta(lopp(Y)).
-reisi(X, Y, Path, Cost) :- lennukiga(X, Y, Cost), Path = mine(X, Y, lennukiga), not(labitud(Path)), asserta(lopp(Y)).
+reisi(X, Y, Path, Cost) :- lennukiga(X, Y, Cost), Path = mine(X, Y, lennukiga), write("a"), not(labitud(Path)), asserta(lopp(Y)).
 
 reisi(_, Y, _, _) :- lopp(Y), retractall(lopp(Y)), !, fail.
 
@@ -133,6 +133,7 @@ reisi(X, Y, Path, Cost, TimeS) :-
 reisi(_, Y, _, _, _) :- lopp(Y), retractall(lopp(Y)), !, fail.
 
 reisi(X, Y, Path, Cost, TimeS) :-
+  not(labitud(X)),
   (
     laevaga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, laevaga, SubPath);
     bussiga(X, Z, CostA, TimeStart, TimeEnd), Path = mine(X, Z, bussiga, SubPath);
@@ -143,9 +144,11 @@ reisi(X, Y, Path, Cost, TimeS) :-
   time_diff_s(TimeLast, TimeStart, WaitTime),
   WaitTime > 60 * 60,
   not(labitud(Path)),
+  write(Path), write("\n"),
   asserta(labitud(Path)),
   abolish(eelmise_lopp/1), asserta(eelmise_lopp(TimeEnd)),
-  (reisi(Z, Y, SubPath, CostB, TimeRest) ; retract(labitud(Path)), retract(eelmise_lopp/1), asserta(eelmise_lopp(TimeLast)), fail),
+  Succ = reisi(Z, Y, SubPath, CostB, TimeRest),
+  (Succ ; not(Succ), retract(labitud(Path)), retract(eelmise_lopp/1), asserta(eelmise_lopp(TimeLast)), fail),
   retract(labitud(Path)),
   Cost is CostA + CostB,
   time_diff_s(TimeStart, TimeEnd, TimeCurr),
