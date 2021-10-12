@@ -59,19 +59,19 @@ reisi_transpordiga(_, Y, _) :- lopp(Y), retractall(lopp(Y)), !, fail.
 
 reisi_transpordiga(X, Y, mine(X, Z, laevaga, SubPath)) :- laevaga(X, Z, _), 
   not(labitud(Path)), asserta(labitud(Path)), 
-  (reisi_transpordiga(Z, Y, SubPath) ; retract(labitud(Path)), fail),
+  (reisi_transpordiga(Z, Y, SubPath) ; not(reisi_transpordiga(Z, Y, SubPath)), retract(labitud(Path)), fail),
   retract(labitud(Path)).
 reisi_transpordiga(X, Y, mine(X, Z, bussiga, SubPath)) :- bussiga(X, Z, _), 
   not(labitud(Path)), asserta(labitud(Path)), 
-  (reisi_transpordiga(Z, Y, SubPath) ; retract(labitud(Path)), fail),
+  (reisi_transpordiga(Z, Y, SubPath) ; not(reisi_transpordiga(Z, Y, SubPath)), retract(labitud(Path)), fail),
   retract(labitud(Path)).
 reisi_transpordiga(X, Y, mine(X, Z, rongiga, SubPath)) :- rongiga(X, Z, _), 
   not(labitud(Path)), asserta(labitud(Path)), 
-  (reisi_transpordiga(Z, Y, SubPath) ; retract(labitud(Path)), fail),
+  (reisi_transpordiga(Z, Y, SubPath) ; not(reisi_transpordiga(Z, Y, SubPath)), retract(labitud(Path)), fail),
   retract(labitud(Path)).
 reisi_transpordiga(X, Y, mine(X, Z, lennukiga, SubPath)) :- lennukiga(X, Z, _),
   not(labitud(Path)), asserta(labitud(Path)), 
-  (reisi_transpordiga(Z, Y, SubPath) ; retract(labitud(Path)), fail),
+  (reisi_transpordiga(Z, Y, SubPath) ; not(reisi_transpordiga(Z, Y, SubPath)), retract(labitud(Path)), fail),
   retract(labitud(Path)).
 
 
@@ -90,7 +90,8 @@ reisi(X, Y, Path, Cost) :-
     lennukiga(X, Z, CostA), Path = mine(X, Z, lennukiga, SubPath)
   ),
   not(labitud(Path)), asserta(labitud(Path)),
-  (reisi(Z, Y, SubPath, CostB) ; retract(labitud(Path)), fail),
+  Succ = reisi(Z, Y, SubPath, CostB),
+  (Succ ; not(Succ), retract(labitud(Path)), fail),
   Cost is CostA + CostB,
   retract(labitud(Path)).
 
@@ -144,7 +145,7 @@ reisi(X, Y, Path, Cost, TimeS) :-
   time_diff_s(TimeLast, TimeStart, WaitTime),
   WaitTime > 60 * 60,
   not(labitud(Path)),
-  write(Path), write("\n"),
+  % write(Path), write("\n"),
   asserta(labitud(Path)),
   abolish(eelmise_lopp/1), asserta(eelmise_lopp(TimeEnd)),
   Succ = reisi(Z, Y, SubPath, CostB, TimeRest),

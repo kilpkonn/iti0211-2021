@@ -58,8 +58,8 @@ def prolog_query(start, end):
 
 if __name__ == "__main__":
     # add_data()
-    # prolog_query("fra", "arn")
+    prolog_query("fra", "arn")
     prolog_query("lon", "arn")
-    # prolog_query("fra", "pmi")
-    # prolog_query("got", "agp")
+    prolog_query("fra", "pmi")
+    prolog_query("got", "agp")
 
