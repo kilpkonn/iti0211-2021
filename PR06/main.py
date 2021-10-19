@@ -52,6 +52,7 @@ def prolog_query(start, end):
         prolog.assertz(trip)
     # res = prolog.query(f"reisi({start}, {end}, Path, Cost, Time)")
     res = prolog.query(f"lyhim_reis({start}, {end}, Path, Cost)")
+    # res = prolog.query(f"odavaim_reis({start}, {end}, Path, Cost)")  # <- change data file for it
     for sol in res:
         # print(sol["Path"], sol["Cost"], sol["Time"])
         print(sol["Path"], sol["Cost"])
@@ -62,4 +63,5 @@ if __name__ == "__main__":
     prolog_query("lon", "arn")
     prolog_query("fra", "pmi")
     prolog_query("got", "agp")
+    prolog_query("mow", "sao")
 

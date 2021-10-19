@@ -1,4 +1,7 @@
+:- use_module(library(lists)).
+
 :- dynamic lennukiga/5.
+:- dynamic lennukiga/3.
 
 laevaga(tallinn, helsinki, 120).
 laevaga(tallinn, stockholm, 480).
@@ -78,7 +81,7 @@ reisi_transpordiga(X, Y, mine(X, Z, lennukiga, SubPath)) :- lennukiga(X, Z, _),
 reisi(X, Y, Path, Cost) :- laevaga(X, Y, Cost), Path = mine(X, Y, laevaga), not(labitud(Path)), asserta(lopp(Y)).
 reisi(X, Y, Path, Cost) :- bussiga(X, Y, Cost), Path = mine(X, Y, bussiga), not(labitud(Path)), asserta(lopp(Y)).
 reisi(X, Y, Path, Cost) :- rongiga(X, Y, Cost), Path = mine(X, Y, rongiga), not(labitud(Path)), asserta(lopp(Y)).
-reisi(X, Y, Path, Cost) :- lennukiga(X, Y, Cost), Path = mine(X, Y, lennukiga), write("a"), not(labitud(Path)), asserta(lopp(Y)).
+reisi(X, Y, Path, Cost) :- lennukiga(X, Y, Cost), Path = mine(X, Y, lennukiga), not(labitud(Path)), asserta(lopp(Y)).
 
 reisi(_, Y, _, _) :- lopp(Y), retractall(lopp(Y)), !, fail.
 
@@ -96,13 +99,8 @@ reisi(X, Y, Path, Cost) :-
   retract(labitud(Path)).
 
 
-min_list([Head], Head).
-min_list([Head, Next | Tail], N) :- 
-  (Head =< Next, min_list([Head | Tail], N));
-  (Head > Next, min_list([Next | Tail], N)).
-
 odavaim_reis(X, Y, Path, Cost) :- 
-  findall(TmpCost, reisi(X, Y, _, TmpCost), Results),
+  bagof(TmpCost, reisi(X, Y, _, TmpCost), Results),
   min_list(Results, Cost),
   reisi(X, Y, Path, Cost).
 
