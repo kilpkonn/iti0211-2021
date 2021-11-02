@@ -148,7 +148,6 @@ reisi(X, Y, Path, Cost, TimeS) :-
   abolish(eelmise_lopp/1), asserta(eelmise_lopp(TimeEnd)),
   Succ = reisi(Z, Y, SubPath, CostB, TimeRest),
   (Succ ; not(Succ), retract(labitud(Path)), retract(eelmise_lopp/1), asserta(eelmise_lopp(TimeLast)), fail),
-  retract(labitud(Path)),
   Cost is CostA + CostB,
   time_diff_s(TimeStart, TimeEnd, TimeCurr),
   TimeS is TimeCurr + TimeRest,

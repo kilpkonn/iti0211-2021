@@ -291,10 +291,13 @@ vanus(vana, 9, 15).
 vanus(romu, 16, 20).
 vanus(uunikum, 21, 999).
 
-grupeeri_autod :-
-  functor(Term, auto, 5),
+
+grupeeri_autod :- grupeeri(auto, 5, 2).
+
+grupeeri(X, Arity, ArgNr) :-
+  functor(Term, X, Arity),
   Term,
-  arg(2, Term, Year),
+  arg(ArgNr, Term, Year),
   vanus(Name, Min, Max),
   Min =< 2021 - Year,
   Max >= 2021 - Year,
