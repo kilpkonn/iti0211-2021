@@ -25,9 +25,9 @@ eitus --> [ei]; [].
 tegusona --> [kasva]; [ajab]; [tuleb]; [laheb]; [jaavad].
 tegijafraas --> sihitisfraas, tegija; tegija.
 tegija --> [sammal]; [uhkus]; [raha]; [volad].
-sihitisfraas --> omadussona, sihitis; sihitis. 
-sihitis --> [kivile].
-omadussona --> [veerevale].
+sihitisfraas --> omadussona, sihitis. 
+sihitis --> [kivile].  %# <- See vb pole sihitis aga mida iganes...
+omadussona --> [veerevale] ; [].
 
 liitlause --> lihtlause, liitlause_liitja, (lihtlause ; liitlause). 
 liitlause_liitja --> [","].
