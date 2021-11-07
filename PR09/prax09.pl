@@ -34,5 +34,5 @@ liitlause_liitja --> [','].
 
 % phrase(lihtlause, [veerevale, kivile, sammal, ei, kasva])
 % phrase(lihtlause, [uhkus, ajab, upakile])
-% phrase(liitlause, [raha, tuleb, ",", raha, laheb, ",", volad, jaavad]).
+% phrase(liitlause, [raha, tuleb, ',', raha, laheb, ',', volad, jaavad]). % <- '' /= ""
 
