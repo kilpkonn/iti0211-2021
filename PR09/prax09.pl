@@ -29,7 +29,7 @@ sihitisfraas --> omadussona, sihitis; sihitis.
 sihitis --> [kivile].
 omadussona --> [veerevale].
 
-liitlause --> lihtlause ; lihtlause, liitlause_liitja, liitlause. 
+liitlause --> lihtlause, liitlause_liitja, (lihtlause ; liitlause). 
 liitlause_liitja --> [","].
 
 % phrase(lihtlause, [veerevale, kivile, sammal, ei, kasva])
