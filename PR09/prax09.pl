@@ -30,7 +30,7 @@ sihitis --> [kivile].  %# <- See vb pole sihitis aga mida iganes...
 omadussona --> [veerevale] ; [].
 
 liitlause --> lihtlause, liitlause_liitja, (lihtlause ; liitlause). 
-liitlause_liitja --> [","].
+liitlause_liitja --> [','].
 
 % phrase(lihtlause, [veerevale, kivile, sammal, ei, kasva])
 % phrase(lihtlause, [uhkus, ajab, upakile])
