@@ -24,7 +24,7 @@ kas_saab_votta(X,Y,Suund,X1,Y1,X2,Y2):-  % Votmine edasi paremale
     X1 is X + Suund,
     Y1 is Y + 1,
     ruut(X1,Y1, Color),
-    Color =\= 0,
+    Color =\= MyColor, Color =\= 0,
     X2 is X1 + Suund,
     Y2 is Y1 + 1,
     ruut(X2,Y2, 0).
@@ -32,7 +32,7 @@ kas_saab_votta(X,Y,Suund,X1,Y1,X2,Y2):-  % Votmine edasi vasakule
     X1 is X + Suund,
     Y1 is Y - 1,
     ruut(X1,Y1, Color),
-    Color =\= 0,
+    Color =\= MyColor, Color =\= 0,
     X2 is X1 + Suund,
     Y2 is Y1 - 1,
     ruut(X2,Y2, 0).
@@ -40,7 +40,7 @@ kas_saab_votta(X,Y,Suund,X1,Y1,X2,Y2):-  % Votmine tagasi paremale
     X1 is X + Suund * -1,
     Y1 is Y + 1,
     ruut(X1,Y1, Color),
-    Color =\= 0,
+    Color =\= MyColor, Color =\= 0,
     X2 is X1 + Suund * -1,
     Y2 is Y1 + 1,
     ruut(X2,Y2, 0).
@@ -48,7 +48,7 @@ kas_saab_votta(X,Y,Suund,X1,Y1,X2,Y2):-  % Votmine tagasi vasakule
     X1 is X + Suund * -1,
     Y1 is Y - 1,
     ruut(X1,Y1, Color),
-    Color =\= 0,
+    Color =\= MyColor, Color =\= 0,
     X2 is X1 + Suund * -1,
     Y2 is Y1 - 1,
     ruut(X2,Y2, 0).
@@ -173,6 +173,6 @@ status:-
 
 %=================== Print checkers board v2 - End ====================
 
-tee_kaik(X,Y,X1,Y1) :- retract(ruut(X, Y, C)), retract(ruut(X1, Y1, _)), assertz(ruut(X, Y, 0)), assertz(ruut(X1, Y1, C)).
+tee_kaik(X,Y,X1,Y1) :- retract(ruut(X, Y, C)), retract(ruut(X1, Y1, 0)), assertz(ruut(X, Y, 0)), assertz(ruut(X1, Y1, C)).
 % From, Dir, Over, To
 vota(X,Y,_,X1,Y1,X2,Y2) :- retract(ruut(X1, Y1, _)), assertz(ruut(X1, Y1, 0)), tee_kaik(X, Y, X2, Y2).
