@@ -74,7 +74,7 @@ kas_naaber_vaba(X,Y,X1,Y1):-
     ruut(X,Y, Status),
     assert(ruut1(X1,Y1, Status)),!.
 
-%---------MÄNGU ALGSEIS-------------
+%---------MANGU ALGSEIS-------------
 :- dynamic ruut/3.
 
 % Valged
@@ -115,7 +115,7 @@ ruut(8,8,2).
 
 /*
 ruut(X,Y, Status).  %   kus X, Y [1,8]      
-Status = 0      % tühi
+Status = 0      % tuhi
 Status = 1      % valge
 Status = 2      %  must
 */
@@ -175,4 +175,4 @@ status:-
 
 tee_kaik(X,Y,X1,Y1) :- retract(ruut(X, Y, C)), retract(ruut(X1, Y1, _)), assertz(ruut(X, Y, 0)), assertz(ruut(X1, Y1, C)).
 % From, Dir, Over, To
-vota(X,Y,Suund,X1,Y1,X2,Y2) :- retract(ruut(X1, Y1, _)), assertz(ruut(X1, Y1, 0)), tee_kaik(X, Y, X2, Y2).
+vota(X,Y,_,X1,Y1,X2,Y2) :- retract(ruut(X1, Y1, _)), assertz(ruut(X1, Y1, 0)), tee_kaik(X, Y, X2, Y2).
