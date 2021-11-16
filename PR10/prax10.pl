@@ -1,4 +1,3 @@
-
 main(MyColor):-
     ruut(X,Y, MyColor), 
     nl, write([MyColor, 'Nupp ', ruudul, X,Y]),
