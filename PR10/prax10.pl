@@ -173,6 +173,6 @@ status:-
 
 %=================== Print checkers board v2 - End ====================
 
-tee_kaik(X,Y,X1,Y1) :- retract(ruut(X, Y, C)), retract(ruut(X1, Y1, 0)), assertz(ruut(X, Y, 0)), assertz(ruut(X1, Y1, C)).
+tee_kaik(X,Y,X1,Y1) :- retract(ruut(X, Y, C)), retract(ruut(X1, Y1, 0)), assertz(ruut(X, Y, 0)), assertz(ruut(X1, Y1, C)), !.
 % From, Dir, Over, To
-vota(X,Y,_,X1,Y1,X2,Y2) :- retract(ruut(X1, Y1, _)), assertz(ruut(X1, Y1, 0)), tee_kaik(X, Y, X2, Y2).
+vota(X,Y,_,X1,Y1,X2,Y2) :- retract(ruut(X1, Y1, _)), assertz(ruut(X1, Y1, 0)), tee_kaik(X, Y, X2, Y2), !.
