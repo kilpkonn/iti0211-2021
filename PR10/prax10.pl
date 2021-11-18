@@ -1,7 +1,5 @@
-:- dynamic(ruut/3).
-
 main(MyColor):-
-    ruut(X,Y, MyColor),
+    ruut(X,Y, MyColor), 
     nl, write([MyColor, 'Nupp ', ruudul, X,Y]),
     leia_suund(MyColor,Suund),
     kaigu_variandid(X,Y,Suund,X1,Y1),
@@ -19,23 +17,14 @@ kaigu_variandid(X,Y,Suund,X1,Y1):-
 %--------------------------------
 votmine(X,Y,Suund,X1,Y1):-
     kas_saab_votta(X,Y,Suund,X1,Y1,X2,Y2),
-
     vota(X,Y,Suund,X1,Y1,X2,Y2),
     fail.
-
-vota(X,Y,Suund,X1,Y1,X2,Y2):-
-    retract(ruut(X,Y,Varv)),
-    assert(ruut(X,Y,0)),
-    retract(ruut(X1,Y1,_)),
-    assert(ruut(X1,Y1,0)),
-    retract(ruut(X2,Y2,_)),
-    assert(ruut(X2,Y2,Varv)).
 %--------
 kas_saab_votta(X,Y,Suund,X1,Y1,X2,Y2):-  % Votmine edasi paremale
     X1 is X + Suund,
     Y1 is Y + 1,
     ruut(X1,Y1, Color),
-    Color =\= MyColor, Color =\= 0,
+    Color =\= 0,
     X2 is X1 + Suund,
     Y2 is Y1 + 1,
     ruut(X2,Y2, 0).
@@ -43,7 +32,7 @@ kas_saab_votta(X,Y,Suund,X1,Y1,X2,Y2):-  % Votmine edasi vasakule
     X1 is X + Suund,
     Y1 is Y - 1,
     ruut(X1,Y1, Color),
-    Color =\= MyColor, Color =\= 0,
+    Color =\= 0,
     X2 is X1 + Suund,
     Y2 is Y1 - 1,
     ruut(X2,Y2, 0).
@@ -51,7 +40,7 @@ kas_saab_votta(X,Y,Suund,X1,Y1,X2,Y2):-  % Votmine tagasi paremale
     X1 is X + Suund * -1,
     Y1 is Y + 1,
     ruut(X1,Y1, Color),
-    Color =\= MyColor, Color =\= 0,
+    Color =\= 0,
     X2 is X1 + Suund * -1,
     Y2 is Y1 + 1,
     ruut(X2,Y2, 0).
@@ -59,10 +48,14 @@ kas_saab_votta(X,Y,Suund,X1,Y1,X2,Y2):-  % Votmine tagasi vasakule
     X1 is X + Suund * -1,
     Y1 is Y - 1,
     ruut(X1,Y1, Color),
-    Color =\= MyColor, Color =\= 0,
+    Color =\= 0,
     X2 is X1 + Suund * -1,
     Y2 is Y1 - 1,
     ruut(X2,Y2, 0).
+
+tee_kaik(X,Y,X1,Y1) :- retract(ruut(X, Y, C)), retract(ruut(X1, Y1, 0)), assertz(ruut(X, Y, 0)), assertz(ruut(X1, Y1, C)).
+% From, Dir, Over, To
+vota(X,Y,_,X1,Y1,X2,Y2) :- retract(ruut(X1, Y1, _)), assertz(ruut(X1, Y1, 0)), tee_kaik(X, Y, X2, Y2).
 
 %--------------------------------
 kaimine(X,Y,Suund,X1,Y1):-
@@ -71,12 +64,6 @@ kaimine(X,Y,Suund,X1,Y1):-
     write([' kaib ', X1,Y1]),
     fail.
 kaimine(_,_,_,_,_).
-
-tee_kaik(X,Y,X1,Y1):-
-    retract(ruut(X,Y,Varv)),
-    assert(ruut(X,Y,0)),
-    retract(ruut(X1,Y1,_)),
-    assert(ruut(X1,Y1,Varv)).
 
 kas_naaber_vaba(X,Y,Suund,X1,Y1):-
     X1 is X +Suund,
@@ -91,7 +78,9 @@ kas_naaber_vaba(X,Y,X1,Y1):-
     ruut(X,Y, Status),
     assert(ruut1(X1,Y1, Status)),!.
 
-%---------MДNGU ALGSEIS-------------
+%---------MANGU ALGSEIS-------------
+:- dynamic ruut/3.
+
 % Valged
 ruut(1,1,1).
 ruut(1,3,1).
@@ -105,7 +94,7 @@ ruut(3,1,1).
 ruut(3,3,1).
 ruut(3,5,1).
 ruut(3,7,1).
-% Tьhjad ruudud
+% Tuhjad ruudud
 ruut(4,2,0).
 ruut(4,4,0).
 ruut(4,6,0).
@@ -129,8 +118,8 @@ ruut(8,6,2).
 ruut(8,8,2).
 
 /*
-ruut(X,Y, Status).  %   kus X, Y [1,8]
-Status = 0      % tьhi
+ruut(X,Y, Status).  %   kus X, Y [1,8]      
+Status = 0      % tuhi
 Status = 1      % valge
 Status = 2      %  must
 */
