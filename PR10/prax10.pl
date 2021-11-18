@@ -53,6 +53,10 @@ kas_saab_votta(X,Y,Suund,X1,Y1,X2,Y2):-  % Votmine tagasi vasakule
     Y2 is Y1 - 1,
     ruut(X2,Y2, 0).
 
+tee_kaik(X,Y,X1,Y1) :- retract(ruut(X, Y, C)), retract(ruut(X1, Y1, 0)), assertz(ruut(X, Y, 0)), assertz(ruut(X1, Y1, C)).
+% From, Dir, Over, To
+vota(X,Y,_,X1,Y1,X2,Y2) :- retract(ruut(X1, Y1, _)), assertz(ruut(X1, Y1, 0)), tee_kaik(X, Y, X2, Y2).
+
 %--------------------------------
 kaimine(X,Y,Suund,X1,Y1):-
     kas_naaber_vaba(X,Y,Suund,X1,Y1),
@@ -173,6 +177,3 @@ status:-
 
 %=================== Print checkers board v2 - End ====================
 
-tee_kaik(X,Y,X1,Y1) :- retract(ruut(X, Y, C)), retract(ruut(X1, Y1, 0)), assertz(ruut(X, Y, 0)), assertz(ruut(X1, Y1, C)), !.
-% From, Dir, Over, To
-vota(X,Y,_,X1,Y1,X2,Y2) :- retract(ruut(X1, Y1, _)), assertz(ruut(X1, Y1, 0)), tee_kaik(X, Y, X2, Y2), !.
