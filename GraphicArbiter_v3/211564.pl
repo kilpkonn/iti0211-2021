@@ -5,7 +5,7 @@
 iapm211564(Color, X, Y) :-
   findall(R, (ruut(X1, Y1, C), R = ruut(X1, Y1, C)), State),
   find_matching_state(State, StateId),
-  simulate_moves(StateId, Color, _, _, 5),
+  simulate_moves(StateId, Color, _, _, 15),
   !.
 iapm211564(_, _, _).
 
@@ -99,7 +99,10 @@ do_move(FromId, ToId, FromX, FromY, ToX, ToY) :-
   asserta(state(ToId, FromX, FromY, 0)),
   asserta(state(ToId, ToX, ToY, Color)),
   state(FromId, X, Y, C),
-  not((X \= FromX, X \= ToX, Y \= FromY, Y \= ToY)),
+  not((
+    X = FromX, Y = FromY ;
+    X = ToX, Y = ToY
+  )),
   asserta(state(ToId, X, Y, C)),
   fail.
 % do_move(_, _, _, _, _, _) :- !.
@@ -111,7 +114,10 @@ do_eat(FromId, ToId, FromX, FromY, OverX, OverY, ToX, ToY) :-
   asserta(state(ToId, OverX, OverY, 0)),
   asserta(state(ToId, ToX, ToY, Color)),
   state(FromId, X, Y, C),
-  not((X \= FromX, X \= OverX, X \= ToX, Y \= FromY, Y \= OverY, Y \= ToY)),
+  not((
+    X = FromX, Y = FromY ;
+    X = OverX, Y = OverY ;
+    X = ToX, Y = ToY)),
   asserta(state(ToId, X, Y, C)),
   fail.
 % do_eat(_, _, _, _, _, _, _, _) :- !.
