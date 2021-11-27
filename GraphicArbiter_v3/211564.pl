@@ -5,7 +5,7 @@
 iapm211564(Color, X, Y) :-
   findall(R, (ruut(X1, Y1, C), R = ruut(X1, Y1, C)), State),
   find_matching_state(State, StateId),
-  simulate_moves(StateId, Color, _, _, 15),
+  simulate_moves(StateId, Color, _, _, 3),
   !.
 iapm211564(_, _, _).
 
@@ -20,13 +20,11 @@ last_id(0).
 foo.
 
 simulate_moves(CurrentId, Color, FromX, FromY, Depth) :-
-  (CurrentId >= 23, foo ; true),
   Depth >= 0,
   state(CurrentId, FromX, FromY, Color),  % Go over all own stones onless forced to one
   possible_simple_take(CurrentId, Color, FromX, FromY, OverX, OverY, ToX, ToY),
   increment_id(NewId),
   do_eat(CurrentId, NewId, FromX, FromY, OverX, OverY, ToX, ToY),
-  asserta(move_option(CurrentId, NewId, FromX, FromY, ToX, ToY, -1)),  % TODO: score
   (
     Color = 1, NewColor = 2;
     Color = 2, NewColor = 1
@@ -39,10 +37,8 @@ simulate_moves(CurrentId, Color, FromX, FromY, Depth) :-
   Depth >= 0,
   state(CurrentId, FromX, FromY, Color),  % Go over all own stones onless forced to one
   possible_simple_move(CurrentId, Color, FromX, FromY, ToX, ToY),
-  write([CurrentId, Color, Depth, FromX, FromY, ToX, ToY]),
   increment_id(NewId),
   do_move(CurrentId, NewId, FromX, FromY, ToX, ToY),
-  asserta(move_option(CurrentId, NewId, FromX, FromY, ToX, ToY, -1)),  % TODO: score
   (
     Color = 1, NewColor = 2;
     Color = 2, NewColor = 1
@@ -93,11 +89,15 @@ same_color(1, 10).
 same_color(2, 20).
 
 
+% do_move(FromId, ToId, _, _, _, _) :-
+%   move_option(FromId, ToId, _, _, _, _, _), !.
+
 do_move(FromId, ToId, FromX, FromY, ToX, ToY) :-
-  not(state(ToId, _, _, _)),
+  is_new_state(ToId),
   state(FromId, FromX, FromY, Color),
   asserta(state(ToId, FromX, FromY, 0)),
   asserta(state(ToId, ToX, ToY, Color)),
+  asserta(move_option(FromId, ToId, FromX, FromY, ToX, ToY, -1)),  % TODO: score
   state(FromId, X, Y, C),
   not((
     X = FromX, Y = FromY ;
@@ -105,14 +105,18 @@ do_move(FromId, ToId, FromX, FromY, ToX, ToY) :-
   )),
   asserta(state(ToId, X, Y, C)),
   fail.
-% do_move(_, _, _, _, _, _) :- !.
+do_move(_, _, _, _, _, _).
+
+% do_eat(FromId, ToId, _, _, _, _, _, _) :-
+%   move_option(FromId, ToId, _, _, _, _, _), !.
 
 do_eat(FromId, ToId, FromX, FromY, OverX, OverY, ToX, ToY) :-
-  not(state(ToId, _, _, _)),
+  is_new_state(ToId),
   state(FromId, FromX, FromY, Color),
   asserta(state(ToId, FromX, FromY, 0)),
   asserta(state(ToId, OverX, OverY, 0)),
   asserta(state(ToId, ToX, ToY, Color)),
+  asserta(move_option(FromId, ToId, FromX, FromY, ToX, ToY, -1)),  % TODO: score
   state(FromId, X, Y, C),
   not((
     X = FromX, Y = FromY ;
@@ -120,7 +124,11 @@ do_eat(FromId, ToId, FromX, FromY, OverX, OverY, ToX, ToY) :-
     X = ToX, Y = ToY)),
   asserta(state(ToId, X, Y, C)),
   fail.
-% do_eat(_, _, _, _, _, _, _, _) :- !.
+do_eat(_, _, _, _, _, _, _, _).
+
+is_new_state(Id) :-
+  not(state(Id, _, _, _)), !.
+
 
 
 stone_score(1, 1).
