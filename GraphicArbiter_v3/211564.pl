@@ -3,8 +3,9 @@
 :- use_module(library(lists)).
 
 iapm211564(Color, X, Y) :-
-  findall(R, (ruut(X, Y, C), R = ruut(X, Y, C)), State),
+  findall(R, (ruut(X1, Y1, C), R = ruut(X1, Y1, C)), State),
   find_matching_state(State, StateId),
+  simulate_moves(StateId, Color, _, _, 5),
   !.
 iapm211564(_, _, _).
 
@@ -16,15 +17,14 @@ last_id(0).
 :- dynamic move_option/7.  % NOTE: FromId, ToId, FromX, FromY, ToX, ToY, Score
 :- dynamic state/4.        % NOTE: Id, X, Y, Color
 
+foo.
 
 simulate_moves(CurrentId, Color, FromX, FromY, Depth) :-
+  (CurrentId >= 23, foo ; true),
   Depth >= 0,
-  ruut(FromX, FromY, Color),  % Go over all own stones onless forced to one
+  state(CurrentId, FromX, FromY, Color),  % Go over all own stones onless forced to one
   possible_simple_take(CurrentId, Color, FromX, FromY, OverX, OverY, ToX, ToY),
-  last_id(Id),
-  NewId is Id + 1,
-  asserta(last_id(NewId)),
-  retractall(last_id/1),
+  increment_id(NewId),
   do_eat(CurrentId, NewId, FromX, FromY, OverX, OverY, ToX, ToY),
   asserta(move_option(CurrentId, NewId, FromX, FromY, ToX, ToY, -1)),  % TODO: score
   (
@@ -37,12 +37,10 @@ simulate_moves(CurrentId, Color, FromX, FromY, Depth) :-
 
 simulate_moves(CurrentId, Color, FromX, FromY, Depth) :-
   Depth >= 0,
-  ruut(FromX, FromY, Color),  % Go over all own stones onless forced to one
-  possible_simple_move(CurrentId, Color, FromX, FromY, OverX, OverY, ToX, ToY),
-  last_id(Id),
-  NewId is Id + 1,
-  retractall(last_id/1),
-  asserta(last_id(NewId)),
+  state(CurrentId, FromX, FromY, Color),  % Go over all own stones onless forced to one
+  possible_simple_move(CurrentId, Color, FromX, FromY, ToX, ToY),
+  write([CurrentId, Color, Depth, FromX, FromY, ToX, ToY]),
+  increment_id(NewId),
   do_move(CurrentId, NewId, FromX, FromY, ToX, ToY),
   asserta(move_option(CurrentId, NewId, FromX, FromY, ToX, ToY, -1)),  % TODO: score
   (
@@ -101,11 +99,10 @@ do_move(FromId, ToId, FromX, FromY, ToX, ToY) :-
   asserta(state(ToId, FromX, FromY, 0)),
   asserta(state(ToId, ToX, ToY, Color)),
   state(FromId, X, Y, C),
-  X \= FromX, X \= ToX,
-  Y \= FromY, Y \= ToY,
+  not((X \= FromX, X \= ToX, Y \= FromY, Y \= ToY)),
   asserta(state(ToId, X, Y, C)),
   fail.
-do_move(_, _, _, _, _, _).
+% do_move(_, _, _, _, _, _) :- !.
 
 do_eat(FromId, ToId, FromX, FromY, OverX, OverY, ToX, ToY) :-
   not(state(ToId, _, _, _)),
@@ -114,11 +111,10 @@ do_eat(FromId, ToId, FromX, FromY, OverX, OverY, ToX, ToY) :-
   asserta(state(ToId, OverX, OverY, 0)),
   asserta(state(ToId, ToX, ToY, Color)),
   state(FromId, X, Y, C),
-  X \= FromX, X \= OverX, X \= ToX,
-  Y \= FromY, Y \= OverY, Y \= ToY,
+  not((X \= FromX, X \= OverX, X \= ToX, Y \= FromY, Y \= OverY, Y \= ToY)),
   asserta(state(ToId, X, Y, C)),
   fail.
-do_eat(_, _, _, _, _, _, _, _).
+% do_eat(_, _, _, _, _, _, _, _) :- !.
 
 
 stone_score(1, 1).
@@ -132,10 +128,7 @@ evaluate_board(Id, Score) :-
 
 
 copy_board :-
-  last_id(Id),
-  NewId is Id + 1,
-  retractall(last_id/1),
-  asserta(last_id(NewId)),
+  increment_id(NewId),
   ruut(X, Y, C),
   asserta(state(NewId, X, Y, C)),
   fail.
@@ -145,21 +138,28 @@ copy_board.
 find_matching_state(State, StateId) :-
   state(Id, _, _, _),
   findall(R, state_to_ruut(Id, R), Res),
-  (
-    unordered_list_eq(State, Res), StateId = Id ;
-    copy_board, last_id(StateId)
-  ).
+  unordered_list_eq(State, Res),
+  StateId = Id.
+
+find_matching_state(_, StateId) :-
+    copy_board, last_id(StateId).
 
 state_to_ruut(Id, State) :-
   state(Id, X, Y, C),
   State = ruut(X, Y, C).
 
 
+increment_id(NewId) :-
+  last_id(Id),
+  NewId is Id + 1,
+  retractall(last_id/1),
+  asserta(last_id(NewId)), !.
+
 unordered_list_eq(Xs, Ys) :-
   length(Xs, L1),
   length(Ys, L2),
   L1 = L2,
-  substract(Xs, Ys, []).
+  subtract(Xs, Ys, []).
 
 sum_list([], 0).
 sum_list([H|T], Sum) :-
