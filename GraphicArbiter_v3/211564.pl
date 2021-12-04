@@ -2,11 +2,17 @@
 
 :- use_module(library(lists)).
 
-iapm211564(Color, X, Y) :-  % TODO: Forced take
+iapm211564(Color, X, Y) :-
   findall(R, (ruut(X1, Y1, C), R = ruut(X1, Y1, C)), State),
   find_matching_state(State, StateId),
-  simulate_moves(StateId, Color, _, _, 3),  % TODO: Fast forward
-  choose_best_move(StateId, Color, MoveId),
+  simulate_moves(StateId, Color, _, _, 3),
+  write([X, Y]), % TODO: Fast forward
+  (
+    X \= 0, Y \= 0, FromX = X, FromY = Y ;
+    true
+  ),
+  choose_best_move(StateId, Color, FromX, FromY, MoveId),
+  write([StateId, "to", MoveId]),
   exec_move(StateId, MoveId),
   !.
 iapm211564(_, _, _).
@@ -63,10 +69,10 @@ possible_simple_move(CurrentId, Color, FromX, FromY, ToX, ToY) :-
 
 possible_simple_take(CurrentId, Color, FromX, FromY, OverX, OverY, ToX, ToY) :-
   (
-    Color = 1, OverX is FromX + 1, ToX is FromX + 2 ;
-    Color = 2, OverY is FromX - 1, ToX is FromX - 2
+    OverX is FromX + 1, ToX is FromX + 2 ;
+    OverX is FromX - 1, ToX is FromX - 2
   ),
-  (ToY is FromY - 1; ToY is FromY + 1),
+  (ToY is FromY - 2, OverY is FromY - 1; ToY is FromY + 2, OverY is FromY + 1),
   on_board(ToX, ToY),
   state(CurrentId, OverX, OverY, OtherColor),
   OtherColor \= 0,
@@ -132,12 +138,12 @@ is_new_state(Id) :-
   not(state(Id, _, _, _)), !.
 
 
-choose_best_move(StateId, Color, MoveId) :-
-  evaluate_moves_tree(StateId, MinScore, MaxScore),
+choose_best_move(StateId, Color, FromX, FromY, MoveId) :-
+  evaluate_moves_tree(StateId, MaxScore, MinScore),
   write([StateId, Color, MinScore, MaxScore]),
   (
-    same_color(Color, 1), move_option(StateId, MoveId, _, _, _, _, _, MaxScore) ;
-    same_color(Color, 2), move_option(StateId, MoveId, _, _, _, _, MinScore, _)
+    same_color(Color, 1), move_option(StateId, MoveId, FromX, FromY, _, _, _, MaxScore) ;
+    same_color(Color, 2), move_option(StateId, MoveId, FromX, FromY, _, _, MinScore, _)
   ).
 
 
@@ -154,8 +160,10 @@ evaluate_moves_tree_step(FromId, ToId, Min, Max) :-
   not(move_option(ToId, _, _, _, _, _, _, _)),
   move_option(FromId, ToId, _, _, _, _, Min, Max), !.
 
-evaluate_moves_tree_step(_, ToId, Min, Max) :-
-  evaluate_moves_tree(ToId, Max, Min), !.
+evaluate_moves_tree_step(FromId, ToId, Min, Max) :-
+  evaluate_moves_tree(ToId, Max, Min),
+  retract(move_option(FromId, ToId, FromX, FromY, ToX, ToY, _, _)),
+  asserta(move_option(FromId, ToId, FromX, FromY, ToX, ToY, MinScore, MaxScore)), !.
 
 evaluate_moves_tree(Id, MaxScore, MinScore) :-
   findall(Tmp, 
@@ -166,9 +174,8 @@ evaluate_moves_tree(Id, MaxScore, MinScore) :-
     ), Res),
   % write([Id, Res]), write("\n"),
   min_and_max(Res, MinScore, MaxScore),
-  write([MinScore, MaxScore]),
-  retract(move_option(FromId, ToId, FromX, FromY, ToX, ToY, _, _)),
-  asserta(move_option(FromId, ToId, FromX, FromY, ToX, ToY, MinScore, MaxScore)), !.
+  % write([MinScore, MaxScore]),
+  !.
 
 copy_board :-
   increment_id(NewId),
@@ -179,11 +186,28 @@ copy_board.
 
 exec_move(FromId, ToId) :-
   move_option(FromId, ToId, FromX, FromY, ToX, ToY, _, _),
-  write([FromX, FromY, ToX, ToY]),
+  write(["move", FromX, FromY, ToX, ToY]),
   retract(ruut(FromX, FromY, C)),
   asserta(ruut(FromX, FromY, 0)),
   retract(ruut(ToX, ToY, _)),
-  asserta(ruut(ToX, ToY, C)).  % TODO: Takes and tamm
+  asserta(ruut(ToX, ToY, C)),
+  eat_in_between(FromX, FromY, ToX, ToY).
+
+eat_in_between(FromX, FromY, ToX, ToY) :-
+  % write([FromX, FromY, ToX, ToY]),
+  ruut(X, Y, _),
+  (
+    FromX < X, X < ToX ;
+    ToX < X, X < FromX
+  ),
+  (
+    FromY < Y, Y < ToY ;
+    ToY < Y, Y < FromY
+  ),
+  retract(ruut(X, Y, _)),
+  asserta(ruut(X, Y, 0)),
+  fail.
+eat_in_between(_, _, _, _).
 
 
 find_matching_state(State, StateId) :-
