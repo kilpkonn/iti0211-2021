@@ -2,10 +2,12 @@
 
 :- use_module(library(lists)).
 
-iapm211564(Color, X, Y) :-
+iapm211564(Color, X, Y) :-  % TODO: Forced take
   findall(R, (ruut(X1, Y1, C), R = ruut(X1, Y1, C)), State),
   find_matching_state(State, StateId),
-  simulate_moves(StateId, Color, _, _, 3),
+  simulate_moves(StateId, Color, _, _, 3),  % TODO: Fast forward
+  choose_best_move(StateId, Color, MoveId),
+  exec_move(StateId, MoveId),
   !.
 iapm211564(_, _, _).
 
@@ -14,10 +16,8 @@ iapm211564(_, _, _).
 last_id(0).
 
 
-:- dynamic move_option/7.  % NOTE: FromId, ToId, FromX, FromY, ToX, ToY, Score
+:- dynamic move_option/8.  % NOTE: FromId, ToId, FromX, FromY, ToX, ToY, MinScore, MaxScore
 :- dynamic state/4.        % NOTE: Id, X, Y, Color
-
-foo.
 
 simulate_moves(CurrentId, Color, FromX, FromY, Depth) :-
   Depth >= 0,
@@ -97,7 +97,6 @@ do_move(FromId, ToId, FromX, FromY, ToX, ToY) :-
   state(FromId, FromX, FromY, Color),
   asserta(state(ToId, FromX, FromY, 0)),
   asserta(state(ToId, ToX, ToY, Color)),
-  asserta(move_option(FromId, ToId, FromX, FromY, ToX, ToY, -1)),  % TODO: score
   state(FromId, X, Y, C),
   not((
     X = FromX, Y = FromY ;
@@ -105,7 +104,9 @@ do_move(FromId, ToId, FromX, FromY, ToX, ToY) :-
   )),
   asserta(state(ToId, X, Y, C)),
   fail.
-do_move(_, _, _, _, _, _).
+do_move(FromId, ToId, FromX, FromY, ToX, ToY) :-
+  evaluate_board(ToId, Score),
+  asserta(move_option(FromId, ToId, FromX, FromY, ToX, ToY, Score, Score)).
 
 % do_eat(FromId, ToId, _, _, _, _, _, _) :-
 %   move_option(FromId, ToId, _, _, _, _, _), !.
@@ -116,7 +117,6 @@ do_eat(FromId, ToId, FromX, FromY, OverX, OverY, ToX, ToY) :-
   asserta(state(ToId, FromX, FromY, 0)),
   asserta(state(ToId, OverX, OverY, 0)),
   asserta(state(ToId, ToX, ToY, Color)),
-  asserta(move_option(FromId, ToId, FromX, FromY, ToX, ToY, -1)),  % TODO: score
   state(FromId, X, Y, C),
   not((
     X = FromX, Y = FromY ;
@@ -124,22 +124,51 @@ do_eat(FromId, ToId, FromX, FromY, OverX, OverY, ToX, ToY) :-
     X = ToX, Y = ToY)),
   asserta(state(ToId, X, Y, C)),
   fail.
-do_eat(_, _, _, _, _, _, _, _).
+do_eat(FromId, ToId, FromX, FromY, _, _, ToX, ToY) :-
+  evaluate_board(ToId, Score),
+  asserta(move_option(FromId, ToId, FromX, FromY, ToX, ToY, Score, Score)).
 
 is_new_state(Id) :-
   not(state(Id, _, _, _)), !.
 
 
+choose_best_move(StateId, Color, MoveId) :-
+  evaluate_moves_tree(StateId, MinScore, MaxScore),
+  write([StateId, Color, MinScore, MaxScore]),
+  (
+    same_color(Color, 1), move_option(StateId, MoveId, _, _, _, _, _, MaxScore) ;
+    same_color(Color, 2), move_option(StateId, MoveId, _, _, _, _, MinScore, _)
+  ).
+
 
 stone_score(1, 1).
-stone_score(2, 1).
+stone_score(2, -1).
 stone_score(10, 10).
-stone_score(20, 10).
+stone_score(20, -10).
 
 evaluate_board(Id, Score) :-
   findall(Score, (state(Id, _, _, Stone), stone_score(Stone, Score)), Scores),
   sum_list(Scores, Score).
 
+evaluate_moves_tree_step(FromId, ToId, Min, Max) :-
+  not(move_option(ToId, _, _, _, _, _, _, _)),
+  move_option(FromId, ToId, _, _, _, _, Min, Max), !.
+
+evaluate_moves_tree_step(_, ToId, Min, Max) :-
+  evaluate_moves_tree(ToId, Max, Min), !.
+
+evaluate_moves_tree(Id, MaxScore, MinScore) :-
+  findall(Tmp, 
+    (
+      move_option(Id, ToOptionId, _, _, _, _, _, _),
+      evaluate_moves_tree_step(Id, ToOptionId, Min, Max),
+      Tmp = minmax(Min, Max)
+    ), Res),
+  % write([Id, Res]), write("\n"),
+  min_and_max(Res, MinScore, MaxScore),
+  write([MinScore, MaxScore]),
+  retract(move_option(FromId, ToId, FromX, FromY, ToX, ToY, _, _)),
+  asserta(move_option(FromId, ToId, FromX, FromY, ToX, ToY, MinScore, MaxScore)), !.
 
 copy_board :-
   increment_id(NewId),
@@ -147,6 +176,14 @@ copy_board :-
   asserta(state(NewId, X, Y, C)),
   fail.
 copy_board.
+
+exec_move(FromId, ToId) :-
+  move_option(FromId, ToId, FromX, FromY, ToX, ToY, _, _),
+  write([FromX, FromY, ToX, ToY]),
+  retract(ruut(FromX, FromY, C)),
+  asserta(ruut(FromX, FromY, 0)),
+  retract(ruut(ToX, ToY, _)),
+  asserta(ruut(ToX, ToY, C)).  % TODO: Takes and tamm
 
 
 find_matching_state(State, StateId) :-
@@ -156,7 +193,7 @@ find_matching_state(State, StateId) :-
   StateId = Id.
 
 find_matching_state(_, StateId) :-
-    copy_board, last_id(StateId).
+  copy_board, last_id(StateId), !.
 
 state_to_ruut(Id, State) :-
   state(Id, X, Y, C),
@@ -179,4 +216,15 @@ sum_list([], 0).
 sum_list([H|T], Sum) :-
    sum_list(T, Rest),
    Sum is H + Rest.
+
+ % Last-call optimization from: https://hpincket.com/prolog-exercise-min-and-max-of-a-list.html 
+min_and_max([minmax(Min, Max)], Min, Max).
+min_and_max([minmax(MinSoFar, MaxSoFar)|R], Min, Max) :-
+    min_and_max_helper(R, MinSoFar, MaxSoFar, Min, Max).
+
+min_and_max_helper([], A, B, A, B).
+min_and_max_helper([minmax(Min, Max)|R], MinSoFar, MaxSoFar, FinalMin, FinalMax) :-
+  MinSoFar1 is min(MinSoFar, Min),
+  MaxSoFar1 is max(MaxSoFar, Max),
+  min_and_max_helper(R, MinSoFar1, MaxSoFar1, FinalMin, FinalMax).
   
