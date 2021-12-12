@@ -51,13 +51,9 @@ simulate_moves(CurrentId, Color, FromX, FromY, Depth) :-
   ),
   increment_id(NewId),
   do_eat(CurrentId, NewId, FromX, FromY, OverX, OverY, ToX, ToY),
-  (
-    Color = 1, NewColor = 2;
-    Color = 2, NewColor = 1
-  ),
   NewDepth is Depth - 1,
-  simulate_moves(NewId, NewColor, _, _, NewDepth),
-  !.  % TODO: Consider multiple eats, and chained eats
+  simulate_moves(NewId, Color, _, _, NewDepth),
+  !.  % TODO: Consider multiple eats
 
 simulate_moves(CurrentId, Color, FromX, FromY, Depth) :-
   Depth >= 0,
