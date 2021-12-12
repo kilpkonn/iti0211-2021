@@ -23,6 +23,7 @@ tulemus --> [upakile]; [].
 tegevus --> eitus, tegusona; tegusona.
 eitus --> [ei]; [].
 tegusona --> [kasva]; [ajab]; [tuleb]; [laheb]; [jaavad].
+
 tegijafraas --> sihitisfraas, tegija; tegija.
 tegija --> [sammal]; [uhkus]; [raha]; [volad].
 sihitisfraas --> omadussona, sihitis. 
