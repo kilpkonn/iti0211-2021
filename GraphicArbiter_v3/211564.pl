@@ -140,25 +140,26 @@ possible_simple_take(CurrentId, Color, FromX, FromY, OverX, OverY, ToX, ToY) :-
 
 possible_king_take(CurrentId, Color, FromX, FromY, OverX, OverY, ToX, ToY) :-
   king_move_len(Len),
-  (
-    Color = 1, ToX is FromX + Len ;
-    Color = 2, ToX is FromX - Len
-  ),
+  (ToX is FromX + Len ; ToX is FromX - Len),
   (ToY is FromY - Len; ToY is FromY + Len),
   on_board(ToX, ToY),
   (
     Color = 1, EatColor = 2 ;
     Color = 2, EatColor = 1
   ),
+  state(CurrentId, ToX, ToY, 0),
   take_path(CurrentId, EatColor, FromX, FromY, OverX, OverY, ToX, ToY, 0).
 
 % From exlusive, 1 eat allowed
-take_path(_, _, FromX, FromY, _, _, ToX, ToY, Eats) :-
+take_path(StateId, _, FromX, FromY, _, _, ToX, ToY, Eats) :-
   FromX = ToX,
   FromY = ToY,
   Eats = 1.
 
 take_path(StateId, EatColor, FromX, FromY, OverX, OverY, ToX, ToY, Eats) :-
+  FromX \= ToX,
+  FromY \= ToY,
+  % write(["take_path", StateId, EatColor, FromX, FromY, OverX, OverY, ToX, ToY, Eats, "\n"]),
   (
     state(StateId, ToX, ToY, 0), NewEats is Eats;
     state(StateId, ToX, ToY, C), same_color(C, EatColor), NewEats is Eats + 1, OverX = ToX, OverY = ToY
@@ -186,9 +187,6 @@ same_color(20, 2).
 same_color(1, 10).
 same_color(2, 20).
 
-
-% do_move(FromId, ToId, _, _, _, _) :-
-%   move_option(FromId, ToId, _, _, _, _, _), !.
 
 do_move(FromId, ToId, FromX, FromY, ToX, ToY) :-
   is_new_state(ToId),
@@ -219,8 +217,6 @@ do_move(FromId, ToId, FromX, FromY, ToX, ToY) :-
   ),
   asserta(move_option(FromId, ToId, FromX, FromY, ToX, ToY, Score, Score, C)).
 
-% do_eat(FromId, ToId, _, _, _, _, _, _) :-
-%   move_option(FromId, ToId, _, _, _, _, _), !.
 
 do_eat(FromId, ToId, FromX, FromY, OverX, OverY, ToX, ToY) :-
   is_new_state(ToId),
@@ -260,34 +256,31 @@ choose_best_move(StateId, Color, FromX, FromY, MoveId) :-
     same_color(Color, 2), C is 2
   ),
   evaluate_moves_tree(StateId, MaxScore, MinScore, C),
-  write([StateId, Color, MinScore, MaxScore]),
+  write([StateId, Color, "scores", MinScore, MaxScore]),
   (
     same_color(Color, 1), move_option(StateId, MoveId, FromX, FromY, _, _, _, MaxScore, 1) ;
     same_color(Color, 2), move_option(StateId, MoveId, FromX, FromY, _, _, MinScore, _, 2)
   ).
 
 
-stone_score(1, -1).
-stone_score(2, 1).
-stone_score(10, -10).
-stone_score(20, 10).
+stone_score(1, 1).
+stone_score(2, -1).
+stone_score(10, 10).
+stone_score(20, -10).
 
 evaluate_board(Id, Score) :-
   findall(Score, (state(Id, _, _, Stone), stone_score(Stone, Score)), Scores),
   sum_list(Scores, Score).
 
 evaluate_moves_tree_step(FromId, ToId, Min, Max, Color) :-
-  not(move_option(ToId, _, _, _, _, _, _, _, Color)),
+  not(move_option(ToId, _, _, _, _, _, _, _, _)),
   move_option(FromId, ToId, _, _, _, _, Min, Max, Color), !.
 
 evaluate_moves_tree_step(FromId, ToId, Min, Max, Color) :-
-  (
-    same_color(Color, 1), C is 2 ;
-    same_color(Color, 2), C is 1
-  ),
-  evaluate_moves_tree(ToId, Max, Min, C),
+  % When we keep taking
+  evaluate_moves_tree(ToId, Max, Min, _),
   retract(move_option(FromId, ToId, FromX, FromY, ToX, ToY, _, _, Color)),
-  asserta(move_option(FromId, ToId, FromX, FromY, ToX, ToY, Min, Max, Color)), !.
+  asserta(move_option(FromId, ToId, FromX, FromY, ToX, ToY, Min, Max, Color)).
 
 evaluate_moves_tree(Id, MaxScore, MinScore, Color) :-
   findall(Tmp, 
@@ -296,7 +289,7 @@ evaluate_moves_tree(Id, MaxScore, MinScore, Color) :-
       evaluate_moves_tree_step(Id, ToOptionId, Min, Max, Color),
       Tmp = minmax(Min, Max)
     ), Res),
-  % write([Id, Res]), write("\n"),
+  write([Id, Res]), write("\n"),
   min_and_max(Res, MinScore, MaxScore),
   % write([MinScore, MaxScore]),
   !.
