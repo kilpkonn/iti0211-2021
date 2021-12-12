@@ -6,7 +6,7 @@ iapm211564(Color, X, Y) :-
   findall(R, (ruut(X1, Y1, C), R = ruut(X1, Y1, C)), State),
   find_matching_state(State, StateId),
   simulate_moves(StateId, Color, _, _, 3),
-  write([X, Y]), % TODO: Fast forward
+  write([X, Y]),
   (
     X \= 0, Y \= 0, FromX = X, FromY = Y ;
     true
@@ -24,6 +24,22 @@ last_id(0).
 
 :- dynamic move_option/9.  % NOTE: FromId, ToId, FromX, FromY, ToX, ToY, MinScore, MaxScore, Color
 :- dynamic state/4.        % NOTE: Id, X, Y, Color
+
+% Fast-forward
+simulate_moves(CurrentId, Color, FromX, FromY, Depth) :-
+  (
+    Color = 1, NewColor = 2;
+    Color = 2, NewColor = 1
+  ),
+  (
+    Depth > 1, NewDepth is Depth - 1 ;
+    NewDepth is Depth
+  ),
+  bagof(_, (
+    move_option(CurrentId, NextId, FromX, FromY, _, _, _, _, Color),
+    simulate_moves(NextId, NewColor, _, _, NewDepth)
+  ), _),
+  !.
 
 simulate_moves(CurrentId, Color, FromX, FromY, Depth) :-
   Depth >= 0,
